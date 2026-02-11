@@ -1,10 +1,10 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
-import authRoutes from "./routes/auth.routes.js"
-import artifactRoutes from "./routes/artifact.routes.js"
-import likeRoutes from "./routes/likes.routes.js"
-import commentRoutes from "./routes/comment.routes.js"
+import authRoutes from "./routes/auth.route.js"
+import artifactRoutes from "./routes/artifacts.route.js"
+import likeRoutes from "./routes/likes.route.js"
+import commentRoutes from "./routes/comment.route.js"
 import cookieParser from "cookie-parser";
 
 
