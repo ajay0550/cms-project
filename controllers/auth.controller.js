@@ -1,29 +1,103 @@
 import {
-  initiateSignup,
-  verifySignupOtp,
-  loginUser
+  initiateSignupService,
+  verifySignupOtpService,
+  loginService
 } from "../services/auth.service.js";
 
-/* SIGNUP INITIATE */
-export const signupInitiate = async (req, res) => {
-  const result = await initiateSignup(req.body);
-  res.json({ success: true, ...result });
+// INITIATE SIGNUP CONTROLLER
+export const initiateSignup = async (req, res) => {
+    console.log("INITIATE SIGNUP CONTROLLER")
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required"
+      });
+    }
+
+    const result = await initiateSignupService(email);
+
+    res.status(200).json({
+      success: true,
+      message: "OTP generated successfully",
+      ...result
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
 };
 
-/* VERIFY OTP */
-export const signupVerifyOtp = async (req, res) => {
-  const user = await verifySignupOtp(req.body);
-  res.json({ success: true, user });
+// VERIFY SIGNUP CONTROLLER
+export const verifySignupOtp = async (req, res) => {
+    console.log("VERIFY SIGNUP CONTROLLER")
+  try {
+    const { email, otp, name, password,role } = req.body;
+
+    if (!email || !otp || !name || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required"
+      });
+    }
+
+    const user = await verifySignupOtpService({
+      email,
+      otp,
+      name,
+      password,
+      role
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User signed up successfully",
+      user
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
 };
 
-/* LOGIN */
+
+// LOGIN CONTROLLER
 export const login = async (req, res) => {
-  const { user, token } = await loginUser(req.body);
+  console.log("LOGIN CONTROLLER")
+    try {
+    const { email, password } = req.body;
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: false
-  });
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password required"
+      });
+    }
 
-  res.json({ success: true, user });
+    const result = await loginService(email, password);
+
+    res.cookie("token",result.token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 1000
+    })
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user: result.user
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: error.message
+    });
+  }
 };

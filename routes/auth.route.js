@@ -1,14 +1,19 @@
 import express from "express";
 import {
-  signupInitiate,
-  signupVerifyOtp,
-  login
-} from "../controllers/auth.controller.js";
+    createArtifact,
+    getArtifacts
+} from "../controllers/artifact.controller.js"
+import { authMiddleware} from "../middleware/auth.middleware.js";
+import { authorizeRoles } from "../middleware/role.middleware.js";
+import { upload } from "../middleware/uploads.middleware.js";
+
 
 const router = express.Router();
 
-router.post("/signup/initiate", signupInitiate);
-router.post("/signup/verify-otp", signupVerifyOtp);
-router.post("/login", login);
+router.post("/create",authMiddleware,createArtifact);
+router.post("/createWithFile",authMiddleware,upload.single("file"), createArtifact);
+router.get("/", authMiddleware, getArtifacts);
+router.get("/", authMiddleware,authorizeRoles("ADMIN"), getArtifacts);
+
 
 export default router;
